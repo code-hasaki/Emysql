@@ -33,8 +33,8 @@
 			    version :: number(), 
 			    thread_id :: number(), 
 			    caps :: number(), 
-			    language :: number, 
-			    prepared=gb_trees:empty(), 
+			    language :: number(), 
+			    prepared=gb_trees:empty() :: any(), 
 			    locked_at :: number(), 
 			    alive=true :: boolean(), 
 			    test_period=0 :: number(), 
@@ -109,7 +109,7 @@
 
 -record(result_packet, {seq_num :: number(), 
 			field_list :: list(),
-			rows, extra}).
+			rows :: any(), extra :: any()}).
 
 -define(TIMEOUT, 8000).
 -define(LOCK_TIMEOUT, 5000).
