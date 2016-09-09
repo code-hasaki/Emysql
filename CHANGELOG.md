@@ -1,14 +1,17 @@
 # Change Log
 
-## [0.4.3](https://github.com/inaka/Emysql/tree/0.4.3) (2016-09-08)
-[Full Changelog](https://github.com/inaka/Emysql/compare/0.4.2...0.4.3)
+## [0.4.4](https://github.com/inaka/Emysql/tree/0.4.4) (2016-09-09)
+[Full Changelog](https://github.com/inaka/Emysql/compare/0.4.2...0.4.4)
 
 **Closed issues:**
 
+- Version Bump to 0.4.3 [\#6](https://github.com/inaka/Emysql/issues/6)
 - Move from erlang.mk to rebar3 [\#3](https://github.com/inaka/Emysql/issues/3)
 
 **Merged pull requests:**
 
+- fix rebar3 compilation [\#8](https://github.com/inaka/Emysql/pull/8) ([Euen](https://github.com/Euen))
+- \[Close \#6\] version bump to 0.4.3 [\#7](https://github.com/inaka/Emysql/pull/7) ([Euen](https://github.com/Euen))
 - Fix bug when import library through hex.pm [\#5](https://github.com/inaka/Emysql/pull/5) ([Euen](https://github.com/Euen))
 - \[Close \#3\] update app.src to be published in hex.pm [\#4](https://github.com/inaka/Emysql/pull/4) ([Euen](https://github.com/Euen))
 
