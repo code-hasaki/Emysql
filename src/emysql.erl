@@ -131,8 +131,6 @@
          insert_id/1
 ]).
 
--type state() :: any().
-
 % for record and constant defines
 -include("emysql.hrl").
 
@@ -324,7 +322,7 @@ add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding) ->
       Database :: string(),
       Encoding :: utf8 | latin1 | {utf8, utf8_unicode_ci} | {utf8, utf8_general_ci},
       StartCmds :: list(binary()),
-      Result :: {reply, {error, pool_already_exists}, state()} | {reply, ok, state() }.
+      Result :: {error, pool_already_exists} | ok.
 add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding, StartCmds) ->
     add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding, StartCmds, infinity).
 
