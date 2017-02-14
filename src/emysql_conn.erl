@@ -29,7 +29,7 @@
 -export([set_database/2, set_encoding/2,
         execute/3, prepare/3, unprepare/2,
         open_connections/1, open_connection/1,
-        reset_connection/3, close_connection/1,
+        reset_connection/3, close_connections/1, close_connection/1,
         open_n_connections/2, hstate/1,
         test_connection/2, need_test_connection/1
 ]).
@@ -171,13 +171,9 @@ open_connections(Pool) ->
                 #emysql_connection{} = Conn ->
                     open_connections(Pool#pool{available = queue:in(Conn, Pool#pool.available)});
                 {'EXIT', Reason} ->
-                    AllConns = lists:append(
-                        queue:to_list(Pool#pool.available),
-                        gb_trees:values(Pool#pool.locked)
-                    ),
-                    lists:foreach(fun emysql_conn:close_connection/1, AllConns),
+                    close_connections(Pool),
                     {error, Reason}
-			end;
+            end;
         false ->
             {ok, Pool}
     end.
@@ -269,7 +265,7 @@ set_encoding_or_die(#emysql_connection { socket = Socket } = Connection, Encodin
             gen_tcp:close(Socket),
             exit({failed_to_set_encoding, Err2#error_packet.msg})
     end.
- 
+
 reset_connection(Pools, Conn, StayLocked) ->
     %% if a process dies or times out while doing work
     %% the socket must be closed and the connection reset
@@ -304,6 +300,13 @@ reset_connection(Pools, Conn, StayLocked) ->
 
 add_monitor_ref(Conn, MonitorRef) ->
     Conn#emysql_connection{monitor_ref = MonitorRef}.
+
+close_connections(Pool) ->
+    AllConns = lists:append(
+                 queue:to_list(Pool#pool.available),
+                 gb_trees:values(Pool#pool.locked)
+                ),
+    lists:foreach(fun emysql_conn:close_connection/1, AllConns).
 
 close_connection(Conn) ->
 	%% garbage collect statements

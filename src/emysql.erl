@@ -293,7 +293,15 @@ add_pool(#pool{pool_id=PoolId,size=Size,user=User,password=Password,host=Host,po
                 {ok, Pool1} -> Pool1;
                 {error, Reason} -> throw(Reason)
             end,
-            emysql_conn_mgr:add_pool(Pool2)
+            case catch emysql_conn_mgr:add_pool(Pool2) of
+                ok ->
+                    ok;
+                {'EXIT', pool_already_exists} ->
+                    emysql_conn:close_connections(Pool2),
+                    {error, pool_already_exists};
+                {'EXIT', Other} ->
+                    exit(Other)
+            end
     end.
 
 %% @spec add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding) -> Result
