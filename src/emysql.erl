@@ -297,6 +297,7 @@ add_pool(#pool{pool_id=PoolId,size=Size,user=User,password=Password,host=Host,po
                 emysql_conn_mgr:add_pool(Pool2)
             catch
                 exit:pool_already_exists ->
+                    emysql_conn:close_connections(Pool2),
                     {error, pool_already_exists}
             end
     end.
