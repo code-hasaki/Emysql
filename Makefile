@@ -1,5 +1,5 @@
 LIBDIR=$(shell erl -eval 'io:format("~s~n", [code:lib_dir()])' -s init stop -noshell)
-VERSION=0.4.6
+VERSION=0.5.0
 PKGNAME=emysql
 APP_NAME=emysql
 
@@ -71,7 +71,7 @@ clean:
 	rm -fr logs
 
 package: clean
-	@mkdir $(PKGNAME)-$(VERSION)/ && cp -rf ebin include Makefile README src support t $(PKGNAME)-$(VERSION)
+	@mkdir $(PKGNAME)-$(VERSION)/ && cp -rf ebin include Makefile README.md src support t $(PKGNAME)-$(VERSION)
 	@COPYFILE_DISABLE=true tar zcf $(PKGNAME)-$(VERSION).tgz $(PKGNAME)-$(VERSION)
 	@rm -rf $(PKGNAME)-$(VERSION)/
 
