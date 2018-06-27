@@ -5,6 +5,12 @@
 **If you run into trouble, please try the 'stable' branch.**
 
 	git checkout origin/stable
+#### Jun 27 2018 hd | doc
+
+* fix: test unit
+* update: otp 21.0
+* add: emysql pool
+
 #### Nov 03 2017 hd | doc
 * fix: [FLOAT column becomes INT after being selected out](https://github.com/Eonblast/Emysql/issues/176)
 * fix: [Encoding of IO lists is unsafe (missing escaping)](https://github.com/Eonblast/Emysql/issues/182)
