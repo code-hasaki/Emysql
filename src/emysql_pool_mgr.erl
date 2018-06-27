@@ -56,7 +56,9 @@
 %% @end
 %%--------------------------------------------------------------------
 start_link() ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+    Res = gen_server:start_link({local, ?SERVER}, ?MODULE, [], []),
+    ok = gen_server:call(?SERVER, {initialize_pools}),
+    Res.
 
 pools() ->
     case ets:info(?MODULE) of
@@ -96,7 +98,7 @@ remove_pool(PoolID) ->
         [{PoolID, Pid}] ->
             ets:delete(?MODULE, PoolID),
             catch emysql_conn_mgr:stop(Pid);
-        _ -> 
+        _ ->
             ok
     end.
 
@@ -125,7 +127,6 @@ get_pool_server(PoolID) ->
 %%--------------------------------------------------------------------
 init([]) ->
     ets:new(?MODULE, [named_table, public, set, {read_concurrency, true}]),
-    erlang:send(erlang:self(), {initialize_pools}),
     {ok, #state{}, ?HIBERNATE_TIMEOUT}.
 
 %%--------------------------------------------------------------------
@@ -142,6 +143,34 @@ init([]) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_call({initialize_pools}, _From, State) ->
+    %% if the emysql application values are not present in the config
+    %% file we will initialize and empty set of pools. Otherwise, the
+    %% values defined in the config are used to initialize the state.
+    InitializesPools =
+        [
+            {PoolId, #pool{
+                pool_id = PoolId,
+                size = proplists:get_value(size, Props, 1),
+                user = proplists:get_value(user, Props),
+                password = proplists:get_value(password, Props),
+                host = proplists:get_value(host, Props),
+                port = proplists:get_value(port, Props),
+                database = proplists:get_value(database, Props),
+                encoding = proplists:get_value(encoding, Props),
+                start_cmds = proplists:get_value(start_cmds, Props, [])
+            }} || {PoolId, Props} <- emysql_app:pools()
+        ],
+    [begin
+        case emysql_conn:open_connections(Pool) of
+            {ok, Pool1} ->
+                emysql_pool_mgr:add_pool(PoolId, Pool1);
+            {error, Reason} ->
+                erlang:throw(Reason)
+        end
+    end || {PoolId, Pool} <- InitializesPools],
+    {reply, ok, State, ?HIBERNATE_TIMEOUT};
+
 handle_call(_Request, _From, State) ->
     {reply, ok, State, ?HIBERNATE_TIMEOUT}.
 
@@ -168,34 +197,6 @@ handle_cast(_Msg, State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_info({initialize_pools}, State) ->
-    %% if the emysql application values are not present in the config      
-    %% file we will initialize and empty set of pools. Otherwise, the      
-    %% values defined in the config are used to initialize the state.      
-    InitializesPools = 
-        [      
-            {PoolId, #pool{     
-                pool_id = PoolId,      
-                size = proplists:get_value(size, Props, 1),        
-                user = proplists:get_value(user, Props),       
-                password = proplists:get_value(password, Props),       
-                host = proplists:get_value(host, Props),       
-                port = proplists:get_value(port, Props),       
-                database = proplists:get_value(database, Props),       
-                encoding = proplists:get_value(encoding, Props),       
-                start_cmds = proplists:get_value(start_cmds, Props, [])        
-            }} || {PoolId, Props} <- emysql_app:pools()     
-        ],
-    [begin
-        case emysql_conn:open_connections(Pool) of
-            {ok, Pool1} ->
-                emysql_pool_mgr:add_pool(PoolId, Pool1);
-            {error, Reason} ->
-                erlang:throw(Reason)
-        end
-    end || {PoolId, Pool} <- InitializesPools],
-    {noreply, State, ?HIBERNATE_TIMEOUT};
-
 handle_info(timeout, State) ->
     proc_lib:hibernate(gen_server, enter_loop,
                [?MODULE, [], State]),

@@ -319,6 +319,7 @@ add_pool(#pool{pool_id=PoolId,size=Size,user=User,password=Password,host=Host,po
                 {ok, Pool1} -> Pool1;
                 {error, Reason} -> throw(Reason)
             end,
+            io:format("~p:~p  PoolId:~p,Pool2:~p.~n",[?MODULE, ?LINE, PoolId,Pool2]),
             {ok, PoolServer} = emysql_pool_mgr:add_pool(PoolId, Pool2),
             [gen_tcp:controlling_process(Conn#emysql_connection.socket, PoolServer)
              || Conn <- queue:to_list(Pool2#pool.available)],
