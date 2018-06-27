@@ -32,7 +32,7 @@
 -export([start_link/0, init/1, handle_call/3, handle_cast/2, handle_info/2]).
 -export([terminate/2, code_change/3]).
 
--export([pools/1, remove_pool/2,
+-export([pools/0, pools/1, remove_pool/2,
         add_connections/3, remove_connections/3,
         lock_connection/2, wait_for_connection/2, wait_for_connection/3,
         pass_connection/2, replace_connection_as_locked/3, replace_connection_as_available/3,
@@ -55,6 +55,12 @@ start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 start_link(Pool) ->
     gen_server:start_link(?MODULE, [Pool], []).
+
+pools() ->
+    lists:foldl(fun
+        ({_PoolId, PoolServer}, Pools) ->
+            Pools ++ pools(PoolServer)
+    end, [],emysql_pool_mgr:pools()).
 
 pools(PoolServer) ->
     gen_server:call(PoolServer, pools, infinity).
