@@ -150,8 +150,6 @@
 -type t_dict() :: dict().
 -endif.
 
--export_type([t_gb_tree/0, t_queue/0, t_dict/0]).
-
 %% @spec start() -> ok
 %% @doc Start the Emysql application.
 %%
