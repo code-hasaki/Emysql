@@ -29,7 +29,7 @@
 -export([set_database/2, set_encoding/2,
         execute/3, transaction/2, prepare/3, unprepare/2,
         open_connections/1, open_connection/1,
-        reset_connection/4, close_connection/1,
+        reset_connection/4, close_connections/1, close_connection/1,
         open_n_connections/3, hstate/1,
         test_connection/3, need_test_connection/1
 ]).
@@ -75,7 +75,7 @@ set_database(Connection, Database) ->
 
 set_encoding(_, undefined) -> ok;
 set_encoding(Connection, {Encoding, Collation}) ->
-    Packet = <<?COM_QUERY, "set names '", (erlang:atom_to_binary(Encoding, utf8))/binary,
+    Packet = <<?COM_QUERY, "set names '", (erlang:atom_to_binary(Encoding, utf8))/binary, 
         "' collate '", (erlang:atom_to_binary(Collation, utf8))/binary,"'">>,
     emysql_tcp:send_and_recv_packet(Connection#emysql_connection.socket, Packet, 0);
 set_encoding(Connection, Encoding) ->
@@ -216,13 +216,9 @@ open_connections(Pool) ->
                 #emysql_connection{} = Conn ->
                     open_connections(Pool#pool{available = queue:in(Conn, Pool#pool.available)});
                 {'EXIT', Reason} ->
-                    AllConns = lists:append(
-                        queue:to_list(Pool#pool.available),
-                        gb_trees:values(Pool#pool.locked)
-                    ),
-                    lists:foreach(fun emysql_conn:close_connection/1, AllConns),
+                    close_connections(Pool),
                     {error, Reason}
-            end;
+			end;
         false ->
             {ok, Pool}
     end.
@@ -305,7 +301,7 @@ run_startcmds_or_die(#emysql_connection{socket=Socket}, StartCmds) ->
         end,
         StartCmds
     ).
-
+ 
 set_encoding_or_die(#emysql_connection { socket = Socket } = Connection, Encoding) ->
     case set_encoding(Connection, Encoding) of
         ok -> ok;
@@ -350,10 +346,17 @@ reset_connection(PoolServer, Pools, Conn, StayLocked) ->
 add_monitor_ref(Conn, MonitorRef) ->
     Conn#emysql_connection{monitor_ref = MonitorRef}.
 
+close_connections(Pool) ->
+    AllConns = lists:append(
+                 queue:to_list(Pool#pool.available),
+                 gb_trees:values(Pool#pool.locked)
+                ),
+    lists:foreach(fun emysql_conn:close_connection/1, AllConns).
+
 close_connection(Conn) ->
-    %% garbage collect statements
-    emysql_statements:remove(Conn#emysql_connection.id),
-    ok = gen_tcp:close(Conn#emysql_connection.socket).
+	%% garbage collect statements
+	emysql_statements:remove(Conn#emysql_connection.id),
+	ok = gen_tcp:close(Conn#emysql_connection.socket).
 
 test_connection(PoolServer, Conn, StayLocked) ->
   case catch emysql_tcp:send_and_recv_packet(Conn#emysql_connection.socket, <<?COM_PING>>, 0) of
@@ -374,9 +377,9 @@ test_connection(PoolServer, Conn, StayLocked) ->
   end.
 
 need_test_connection(Conn) ->
-    (Conn#emysql_connection.test_period =:= 0) orelse
-    (Conn#emysql_connection.last_test_time =:= 0) orelse
-    (Conn#emysql_connection.last_test_time + Conn#emysql_connection.test_period < now_seconds()).
+   (Conn#emysql_connection.test_period =:= 0) orelse
+     (Conn#emysql_connection.last_test_time =:= 0) orelse
+     (Conn#emysql_connection.last_test_time + Conn#emysql_connection.test_period < now_seconds()).
 
 -ifdef(timestamp_support).
 now_seconds() -> os:system_time(1).
@@ -407,16 +410,16 @@ log_warnings(_Sock, _OtherPacket) ->
 
 set_params(_, _, [], Result) -> Result;
 set_params(Connection, Num, Values, _) ->
-    Packet = set_params_packet(Num, Values),
-    emysql_tcp:send_and_recv_packet(Connection#emysql_connection.socket, Packet, 0).
+	Packet = set_params_packet(Num, Values),
+	emysql_tcp:send_and_recv_packet(Connection#emysql_connection.socket, Packet, 0).
 
 set_params_packet(NumStart, Values) ->
-    BinValues = [encode(Val, binary) || Val <- Values],
-    BinNums = [encode(Num, binary) || Num <- lists:seq(NumStart, NumStart + length(Values) - 1)],
-    BinPairs = lists:zip(BinNums, BinValues),
-    Parts = [<<"@", NumBin/binary, "=", ValBin/binary>> || {NumBin, ValBin} <- BinPairs],
-    Sets = list_to_binary(join(Parts, <<",">>)),
-    <<?COM_QUERY, "SET ", Sets/binary>>.
+	BinValues = [encode(Val, binary) || Val <- Values],
+	BinNums = [encode(Num, binary) || Num <- lists:seq(NumStart, NumStart + length(Values) - 1)],
+	BinPairs = lists:zip(BinNums, BinValues),
+	Parts = [<<"@", NumBin/binary, "=", ValBin/binary>> || {NumBin, ValBin} <- BinPairs], 
+	Sets = list_to_binary(join(Parts, <<",">>)),
+	<<?COM_QUERY, "SET ", Sets/binary>>.
 
 %% @doc Join elements of list with Sep
 %%
@@ -498,7 +501,7 @@ encode({_Time1, _Time2, _Time3}=Val, binary) ->
     list_to_binary(encode(Val, list));
 encode(Val, _) ->
     {error, {unrecognized_value, Val}}.
-
+    
 %% @private
 two_digits(Nums) when is_list(Nums) ->
     [two_digits(Num) || Num <- Nums];
