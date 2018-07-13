@@ -46,35 +46,35 @@
               }).
 
 -record(emysql_connection,
-        { id                 :: string()
-        , pool_id            :: atom()
-        , encoding           :: atom() % maybe could be latin1 | utf8 ?
-        , socket             :: inet:socket()
-        , version            :: number()
-        , thread_id          :: number()
-        , caps               :: number()
-        , language           :: number
-        , prepared = gb_trees:empty()
-        , locked_at          :: number()
-        , alive = true       :: boolean()
-        , test_period = 0    :: number()
-        , last_test_time = 0 :: number()
-        , monitor_ref        :: reference()
-        , warnings = false   :: boolean()
+        { id                          :: string()
+        , pool_id                     :: undefined | atom()
+        , encoding                    :: undefined | atom() % maybe could be latin1 | utf8 ?
+        , socket                      :: undefined | inet:socket()
+        , version                     :: undefined | number()
+        , thread_id                   :: undefined | number()
+        , caps                        :: undefined | number()
+        , language                    :: undefined | number()
+        , prepared = gb_trees:empty() :: gb_trees:tree()
+        , locked_at                   :: undefined | number()
+        , alive = true                :: boolean()
+        , test_period = 0             :: number()
+        , last_test_time = 0          :: number()
+        , monitor_ref                 :: undefined | reference()
+        , warnings = false            :: boolean()
         }).
 
 -record(greeting,
         { protocol_version :: number()
-        , server_version   :: binary()
-        , thread_id        :: number()
-        , salt1            :: binary()
-        , salt2            :: binary()
-        , caps             :: number()
-        , caps_high        :: number()
-        , language         :: number()
-        , status           :: number()
-        , seq_num          :: number()
-        , plugin           :: binary()
+        , server_version   :: undefined | binary()
+        , thread_id        :: undefined | number()
+        , salt1            :: undefined | binary()
+        , salt2            :: undefined | binary()
+        , caps             :: undefined | number()
+        , caps_high        :: undefined | number()
+        , language         :: undefined | number()
+        , status           :: undefined | number()
+        , seq_num          :: undefined | number()
+        , plugin           :: undefined | binary()
         }).
 
 -record(field, { seq_num :: number()
@@ -118,13 +118,14 @@
                       }).
 
 -record(eof_packet, { seq_num :: number()
-                    , status :: number()
-                    , warning_count :: number()
+                    , status :: undefined | number()
+                    , warning_count :: undefined | number()
                     }). % extended to mySQL 4.1+ format
 
 -record(result_packet, { seq_num :: number()
-                       , field_list :: list()
-                       , rows, extra
+                       , field_list :: undefined | list()
+                       , rows :: undefined | [list()]
+                       , extra :: undefined | term()
                        }).
 
 -define(TIMEOUT, 8000).
