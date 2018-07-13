@@ -54,7 +54,7 @@
         , thread_id                   :: undefined | number()
         , caps                        :: undefined | number()
         , language                    :: undefined | number()
-        , prepared = gb_trees:empty() :: gb_trees:tree()
+        , prepared = gb_trees:empty() :: emysql:t_gb_tree()
         , locked_at                   :: undefined | number()
         , alive = true                :: boolean()
         , test_period = 0             :: number()
