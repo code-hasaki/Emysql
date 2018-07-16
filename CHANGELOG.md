@@ -1,15 +1,22 @@
 # Change Log
 
-## [0.4.4](https://github.com/inaka/Emysql/tree/0.4.4) (2016-09-09)
-[Full Changelog](https://github.com/inaka/Emysql/compare/0.4.2...0.4.4)
+## [0.5.0](https://github.com/inaka/Emysql/tree/0.5.0) (2018-07-16)
+[Full Changelog](https://github.com/inaka/Emysql/compare/0.4.2...0.5.0)
 
 **Closed issues:**
 
+- Version Bump to 0.4.4 [\#9](https://github.com/inaka/Emysql/issues/9)
 - Version Bump to 0.4.3 [\#6](https://github.com/inaka/Emysql/issues/6)
 - Move from erlang.mk to rebar3 [\#3](https://github.com/inaka/Emysql/issues/3)
 
 **Merged pull requests:**
 
+- Update from @Qingchuwudi's master [\#17](https://github.com/inaka/Emysql/pull/17) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Fix connection leak when add\_pool is called in rapid succession [\#15](https://github.com/inaka/Emysql/pull/15) ([huss01](https://github.com/huss01))
+- Fix dialyzer warnings. [\#13](https://github.com/inaka/Emysql/pull/13) ([f355](https://github.com/f355))
+- Revert "\[Close \#9\] version bump to 0.4.3" [\#12](https://github.com/inaka/Emysql/pull/12) ([Euen](https://github.com/Euen))
+- \[Close \#9\] version bump to 0.4.3 [\#11](https://github.com/inaka/Emysql/pull/11) ([Euen](https://github.com/Euen))
+- \[Close \#9\] version bump to 0.4.4 [\#10](https://github.com/inaka/Emysql/pull/10) ([Euen](https://github.com/Euen))
 - fix rebar3 compilation [\#8](https://github.com/inaka/Emysql/pull/8) ([Euen](https://github.com/Euen))
 - \[Close \#6\] version bump to 0.4.3 [\#7](https://github.com/inaka/Emysql/pull/7) ([Euen](https://github.com/Euen))
 - Fix bug when import library through hex.pm [\#5](https://github.com/inaka/Emysql/pull/5) ([Euen](https://github.com/Euen))
