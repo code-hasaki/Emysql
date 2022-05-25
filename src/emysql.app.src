@@ -3,7 +3,7 @@
 %% lock_timeout (LOCK_TIMEOUT = 5000)
 
 {application, emysql, [
-    {pkg_name, inaka_emysql},
+    {pkg_name, hasaki_emysql},
     {description, "Emysql - Erlang MySQL driver"},
     {vsn, "0.5.1"},
     {modules, []},
