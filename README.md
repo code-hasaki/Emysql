@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/qingchuwudi/Emysql.svg?branch=master)](https://travis-ci.org/qingchuwudi/Emysql)
 
-This is from [Eonblast/Emysql](https://github.com/Eonblast/Emysql)
+This is from [inaka/Emysql](https://github.com/inaka/Emysql)
 
 To use this driver, see the [Samples] further down in this README document.
 
