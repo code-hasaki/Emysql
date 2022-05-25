@@ -8,9 +8,9 @@ To use this driver, see the [Samples] further down in this README document.
 
 ## Introduction
 
-[Eonblast/Emysql/README](https://github.com/Eonblast/Emysql/README.md)
+[Eonblast/Emysql/README](https://github.com/Eonblast/Emysql#readme)
 
-[inaka/Emysql/README](https://github.com/inaka/Emysql/README.md)
+[inaka/Emysql/README](https://github.com/inaka/Emysql#readme)
 
 <hr/>
 
